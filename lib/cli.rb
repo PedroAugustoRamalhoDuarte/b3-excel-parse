@@ -36,7 +36,9 @@ module B3ExcelParse
 
         def call(excel_file_path:, product_name:, **)
           parse = Parse.new(excel_file_path)
+          transactions = parse.product_transactions(product_name)
           amount, total_price, avg_price = parse.product_info(product_name)
+          puts Terminal::Table.new(rows: transactions.map { |k| k.map { |_, y| y } })
           puts "Ativo: #{product_name}"
           puts "Quantidade: #{amount}"
           puts "Preço Total Investido: #{total_price}"
@@ -55,8 +57,7 @@ module B3ExcelParse
             amount, total_price, avg_price = parse.product_info(product_name)
             [product_name, amount, total_price, avg_price]
           end
-          table = Terminal::Table.new(rows: rows)
-          puts table
+          puts Terminal::Table.new(rows:)
         end
       end
 

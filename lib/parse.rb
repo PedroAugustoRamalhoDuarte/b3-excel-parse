@@ -17,15 +17,15 @@ module B3ExcelParse
     def initialize(file_path)
       creek = Creek::Book.new file_path, with_headers: true
       @sheet = creek.sheets[0]
+      @rows = @sheet.simple_rows.drop(1) # Drop header line
     end
 
     def all_products
-      rows = @sheet.simple_rows.drop(1)
-      rows.map { |p| ticket(p[PRODUCT]) }.uniq
+      @rows.map { |p| ticket(p[PRODUCT]) }.uniq
     end
 
     def product_transactions(product_name)
-      @sheet.simple_rows.drop(1).filter { |row| ticket(row[PRODUCT]) == product_name }
+      @rows.filter { |row| ticket(row[PRODUCT]) == product_name }
     end
 
     def product_amount(transactions)
@@ -46,15 +46,12 @@ module B3ExcelParse
     end
 
     def price_to_sum(row)
-
       price = row[TOTAL_PRICE] if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Credito'
       price = -row[TOTAL_PRICE] if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Debito'
       if price
-        if price.is_a?(String)
-          return 0
-        else
-          return price
-        end
+        return 0 if price.is_a?(String)
+
+        return price
       end
       0
     end
