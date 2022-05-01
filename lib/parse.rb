@@ -19,6 +19,10 @@ module B3ExcelParse
       @sheet = creek.sheets[0]
     end
 
+    def all_products
+      @sheet.simple_rows.map { |p| p[PRODUCT] }.uniq
+    end
+
     def product_transactions(product_name)
       @sheet.simple_rows.filter { |row| row[PRODUCT] == product_name }
     end
@@ -31,10 +35,7 @@ module B3ExcelParse
       transactions = product_transactions(product_name)
       total_price = transactions.sum { |row| price_to_sum(row) }
       amount = product_amount(transactions)
-      puts "Ativo: #{product_name}"
-      puts "Quantidade: #{amount}"
-      puts "Preço Total Investido: #{total_price}"
-      puts "Preço médio: #{total_price / amount}"
+      [amount, total_price, (total_price / amount)]
     end
 
     private
