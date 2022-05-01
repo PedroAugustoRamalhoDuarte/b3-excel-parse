@@ -4,6 +4,7 @@ GEM
     creek (2.5.3)
       nokogiri (>= 1.10.0)
       rubyzip (>= 1.0.0)
+    dry-cli (0.7.0)
     nokogiri (1.13.4-x86_64-linux)
       racc (~> 1.4)
     racc (1.6.0)
@@ -15,6 +16,7 @@ PLATFORMS
 
 DEPENDENCIES
   creek
+  dry-cli
   rbs
 
 RUBY VERSION
