@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require 'dry/cli'
+require 'terminal-table'
 require './lib/parse'
 
 module B3ExcelParse
@@ -41,9 +44,26 @@ module B3ExcelParse
         end
       end
 
+      class IRPF < Dry::CLI::Command
+        desc 'Product Info for IRPF'
+
+        argument :excel_file_path, required: true, desc: 'Excel file path from b3'
+
+        def call(excel_file_path:, **)
+          parse = Parse.new(excel_file_path)
+          rows = parse.all_products.map do |product_name|
+            amount, total_price, avg_price = parse.product_info(product_name)
+            [product_name, amount, total_price, avg_price]
+          end
+          table = Terminal::Table.new(rows: rows)
+          puts table
+        end
+      end
+
       register 'version', Version, aliases: %w[v -v --version]
       register 'list-products', ListProducts
       register 'product-info', ProductInfo
+      register 'irpf', IRPF
     end
   end
 end

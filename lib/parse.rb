@@ -35,15 +35,22 @@ module B3ExcelParse
       transactions = product_transactions(product_name)
       total_price = transactions.sum { |row| price_to_sum(row) }
       amount = product_amount(transactions)
-      [amount, total_price, (total_price / amount)]
+      [amount, total_price, (amount != 0 ? (total_price / amount) : 0)]
     end
 
     private
 
     def price_to_sum(row)
-      return row[TOTAL_PRICE] if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Credito'
-      return -row[TOTAL_PRICE] if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Debito'
 
+      price = row[TOTAL_PRICE] if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Credito'
+      price = -row[TOTAL_PRICE] if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Debito'
+      if price
+        if price.is_a?(String)
+          return 0
+        else
+          return price
+        end
+      end
       0
     end
 

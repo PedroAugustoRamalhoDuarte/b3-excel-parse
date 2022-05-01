@@ -6,4 +6,6 @@ ruby '3.1.0'
 gem 'creek'
 gem 'rbs'
 gem 'dry-cli'
+gem 'terminal-table'
+
 
