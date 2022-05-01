@@ -20,11 +20,12 @@ module B3ExcelParse
     end
 
     def all_products
-      @sheet.simple_rows.map { |p| p[PRODUCT] }.uniq
+      rows = @sheet.simple_rows.drop(1)
+      rows.map { |p| ticket(p[PRODUCT]) }.uniq
     end
 
     def product_transactions(product_name)
-      @sheet.simple_rows.filter { |row| row[PRODUCT] == product_name }
+      @sheet.simple_rows.drop(1).filter { |row| ticket(row[PRODUCT]) == product_name }
     end
 
     def product_amount(transactions)
@@ -39,6 +40,10 @@ module B3ExcelParse
     end
 
     private
+
+    def ticket(product_name)
+      product_name.split[0]
+    end
 
     def price_to_sum(row)
 
