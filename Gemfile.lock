@@ -1,0 +1,24 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    creek (2.5.3)
+      nokogiri (>= 1.10.0)
+      rubyzip (>= 1.0.0)
+    nokogiri (1.13.4-x86_64-linux)
+      racc (~> 1.4)
+    racc (1.6.0)
+    rbs (2.3.2)
+    rubyzip (2.3.2)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  creek
+  rbs
+
+RUBY VERSION
+   ruby 3.1.0p0
+
+BUNDLED WITH
+   2.3.3
