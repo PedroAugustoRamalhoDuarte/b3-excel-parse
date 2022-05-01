@@ -46,6 +46,23 @@ module B3ExcelParse
         end
       end
 
+      class Yield < Dry::CLI::Command
+        desc 'Yield for JCP or Dividens'
+
+        argument :excel_file_path, required: true, desc: 'Excel file path from b3'
+
+        def call(excel_file_path:, **)
+          parse = Parse.new(excel_file_path)
+          rows = parse.all_products.map do |product_name|
+            dividens, jscps = parse.product_yield(product_name)
+            dividend_sum = dividens.sum { |d| d['Valor da Operação'] }
+            jscp_sum = jscps.sum { |d| d['Valor da Operação'] }
+            [product_name, dividend_sum, jscp_sum] if dividend_sum.positive? || jscp_sum.positive?
+          end
+          puts Terminal::Table.new(title: 'Rendimentos por Ativo', headings: %w[Ativo Dividendo JCP], rows: rows.compact)
+        end
+      end
+
       class IRPF < Dry::CLI::Command
         desc 'Product Info for IRPF'
 
@@ -65,6 +82,7 @@ module B3ExcelParse
       register 'list-products', ListProducts
       register 'product-info', ProductInfo
       register 'irpf', IRPF
+      register 'yield', Yield
     end
   end
 end

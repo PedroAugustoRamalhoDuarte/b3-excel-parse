@@ -39,6 +39,13 @@ module B3ExcelParse
       [amount, total_price, (amount != 0 ? (total_price / amount) : 0)]
     end
 
+    def product_yield(product_name)
+      transactions = product_transactions(product_name)
+      dividens = transactions.filter { |row| row[TYPE] == 'Dividendo' or row[TYPE] == 'Rendimento' }
+      jpcs = transactions.filter { |row| row[TYPE] == 'Juros Sobre Capital Próprio' }
+      [dividens, jpcs]
+    end
+
     private
 
     def ticket(product_name)
