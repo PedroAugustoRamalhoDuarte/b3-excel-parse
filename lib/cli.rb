@@ -72,8 +72,9 @@ module B3ExcelParse
           parse = Parse.new(excel_file_path)
           rows = parse.all_products.map do |product_name|
             amount, total_price, avg_price = parse.product_info(product_name)
-            [product_name, amount, total_price, avg_price]
+            [product_name, amount, total_price, avg_price] if amount.positive?
           end
+          rows = rows.compact
           puts Terminal::Table.new(rows:)
         end
       end
