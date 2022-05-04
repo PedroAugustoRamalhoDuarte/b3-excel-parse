@@ -42,7 +42,7 @@ module B3ExcelParse
           puts "Ativo: #{product_name}"
           puts "Quantidade: #{amount}"
           puts "Preço Total Investido: #{total_price}"
-          puts "Preço médio: #{avg_price}"
+          puts "Preço médio de compra do ativo: #{avg_price}"
         end
       end
 
@@ -59,7 +59,8 @@ module B3ExcelParse
             jscp_sum = jscps.sum { |d| d['Valor da Operação'] }
             [product_name, dividend_sum, jscp_sum] if dividend_sum.positive? || jscp_sum.positive?
           end
-          puts Terminal::Table.new(title: 'Rendimentos por Ativo', headings: %w[Ativo Dividendo JCP], rows: rows.compact)
+          puts Terminal::Table.new(title: 'Rendimentos por Ativo', headings: %w[Ativo Dividendo JCP],
+                                   rows: rows.compact)
         end
       end
 
@@ -72,10 +73,10 @@ module B3ExcelParse
           parse = Parse.new(excel_file_path)
           rows = parse.all_products.map do |product_name|
             amount, total_price, avg_price = parse.product_info(product_name)
-            [product_name, amount, total_price, avg_price] if amount.positive?
+            [product_name, amount, format('%.2f', total_price), format('%.2f', avg_price)] if amount.positive?
           end
-          rows = rows.compact
-          puts Terminal::Table.new(rows:)
+          puts Terminal::Table.new(title: 'IRPF', rows: rows.compact,
+                                   headings: ['Ativo', 'Quantidade', 'Preço Médio de Compra', 'Valor'])
         end
       end
 

@@ -34,9 +34,10 @@ module B3ExcelParse
 
     def product_info(product_name)
       transactions = product_transactions(product_name)
-      total_price = transactions.sum { |row| price_to_sum(row) }
+      total_bought_price, bought_amount = bought_info(transactions)
       amount = product_amount(transactions)
-      [amount, total_price, (amount != 0 ? (total_price / amount) : 0)]
+      average_bought_price = bought_amount != 0 ? (total_bought_price / bought_amount) : 0
+      [amount, average_bought_price, amount * average_bought_price]
     end
 
     def product_yield(product_name)
@@ -52,15 +53,20 @@ module B3ExcelParse
       product_name.split[0]
     end
 
-    def price_to_sum(row)
-      price = row[TOTAL_PRICE] if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Credito'
-      price = -row[TOTAL_PRICE] if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Debito'
-      if price
-        return 0 if price.is_a?(String)
-
-        return price
+    # @return [total_bought_price, total_bought_amount]
+    def bought_info(transactions)
+      total_price = 0
+      amount = 0
+      transactions.each do |t|
+        price = 0
+        if t[TYPE] == 'Transferência - Liquidação' && t[SIDE] == 'Credito'
+          price = t[TOTAL_PRICE]
+          amount += t[QTD].to_i
+        end
+        price = 0 if price.is_a?(String)
+        total_price += price
       end
-      0
+      [total_price, amount]
     end
 
     def amount_to_sum(row)
