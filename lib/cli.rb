@@ -30,6 +30,7 @@ module B3ExcelParse
       end
 
       class ProductInfo < Dry::CLI::Command
+        include B3ExcelParse::Utils
         desc 'Product Info for IRPF'
 
         argument :excel_file_path, required: true, desc: 'Excel file path from b3'
@@ -38,16 +39,18 @@ module B3ExcelParse
         def call(excel_file_path:, product_name:, **)
           parse = Parse.new(excel_file_path)
           transactions = parse.product_transactions(product_name)
-          amount, total_price, avg_price = parse.product_info(product_name)
+          amount, avg_price, total_price = parse.product_info(product_name)
           puts Terminal::Table.new(rows: transactions.map { |k| k.map { |_, y| y } })
           puts "Ativo: #{product_name}"
           puts "Quantidade: #{amount}"
-          puts "Preço Total Investido: #{total_price}"
-          puts "Preço médio de compra do ativo: #{avg_price}"
+          puts "Preço médio de compra do ativo: #{format_price(avg_price)}"
+          puts "Preço total investido: #{format_price(total_price)}"
         end
       end
 
       class Yield < Dry::CLI::Command
+        include B3ExcelParse::Utils
+
         desc 'Yield for JCP or Dividens'
 
         argument :excel_file_path, required: true, desc: 'Excel file path from b3'
@@ -58,7 +61,7 @@ module B3ExcelParse
             dividens, jscps = parse.product_yield(product_name)
             dividend_sum = dividens.sum { |d| d['Valor da Operação'] }
             jscp_sum = jscps.sum { |d| d['Valor da Operação'] }
-            [product_name, dividend_sum, jscp_sum] if dividend_sum.positive? || jscp_sum.positive?
+            [product_name, format_price(dividend_sum), format_price(jscp_sum)] if dividend_sum.positive? || jscp_sum.positive?
           end
           puts Terminal::Table.new(title: 'Rendimentos por Ativo', headings: %w[Ativo Dividendo JCP],
                                    rows: rows.compact)
