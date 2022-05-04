@@ -3,6 +3,7 @@
 require 'dry/cli'
 require 'terminal-table'
 require './lib/parse'
+require './lib/utils'
 
 module B3ExcelParse
   module CLI
@@ -65,6 +66,8 @@ module B3ExcelParse
       end
 
       class IRPF < Dry::CLI::Command
+        include B3ExcelParse::Utils
+
         desc 'Product Info for IRPF'
 
         argument :excel_file_path, required: true, desc: 'Excel file path from b3'
@@ -73,7 +76,7 @@ module B3ExcelParse
           parse = Parse.new(excel_file_path)
           rows = parse.all_products.map do |product_name|
             amount, total_price, avg_price = parse.product_info(product_name)
-            [product_name, amount, format('%.2f', total_price), format('%.2f', avg_price)] if amount.positive?
+            [product_name, amount, format_price(total_price), format_price(avg_price)] if amount.positive?
           end
           puts Terminal::Table.new(title: 'IRPF', rows: rows.compact,
                                    headings: ['Ativo', 'Quantidade', 'Preço Médio de Compra', 'Valor'])
