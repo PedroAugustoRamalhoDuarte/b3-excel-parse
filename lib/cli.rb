@@ -61,7 +61,10 @@ module B3ExcelParse
             dividens, jscps = parse.product_yield(product_name)
             dividend_sum = dividens.sum { |d| d['Valor da Operação'] }
             jscp_sum = jscps.sum { |d| d['Valor da Operação'] }
-            [product_name, format_price(dividend_sum), format_price(jscp_sum)] if dividend_sum.positive? || jscp_sum.positive?
+            if dividend_sum.positive? || jscp_sum.positive?
+              [product_name, format_price(dividend_sum),
+               format_price(jscp_sum)]
+            end
           end
           puts Terminal::Table.new(title: 'Rendimentos por Ativo', headings: %w[Ativo Dividendo JCP],
                                    rows: rows.compact)
@@ -70,6 +73,7 @@ module B3ExcelParse
 
       class IRPF < Dry::CLI::Command
         include B3ExcelParse::Utils
+        WARN_EMOJI = "\u{26A0}"
 
         desc 'Product Info for IRPF'
 
@@ -79,6 +83,8 @@ module B3ExcelParse
           parse = Parse.new(excel_file_path)
           rows = parse.all_products.map do |product_name|
             amount, total_price, avg_price = parse.product_info(product_name)
+            warning = parse.product_warning?(parse.product_transactions(product_name))
+            product_name += " #{WARN_EMOJI}" if warning
             [product_name, amount, format_price(total_price), format_price(avg_price)] if amount.positive?
           end
           puts Terminal::Table.new(title: 'IRPF', rows: rows.compact,

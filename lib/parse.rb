@@ -13,6 +13,8 @@ module B3ExcelParse
     QTD = 'Quantidade'
     UNIT_PRICE = 'Preço unitário'
     TOTAL_PRICE = 'Valor da Operação'
+    WARN_KEYWORDS = ['Fração em Ativos', 'Empréstimo', 'Desdobro', 'Bonificação em Ativos'].freeze
+
 
     def initialize(file_path)
       creek = Creek::Book.new file_path, with_headers: true
@@ -45,6 +47,11 @@ module B3ExcelParse
       dividens = transactions.filter { |row| row[TYPE] == 'Dividendo' or row[TYPE] == 'Rendimento' }
       jpcs = transactions.filter { |row| row[TYPE] == 'Juros Sobre Capital Próprio' }
       [dividens, jpcs]
+    end
+
+    def product_warning?(transactions)
+      transactions.each { |row| return true if WARN_KEYWORDS.include?(row[TYPE]) }
+      false
     end
 
     private
