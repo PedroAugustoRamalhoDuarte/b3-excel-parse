@@ -27,3 +27,5 @@ CLI para o parse de informações para o excel da B3
 
 Toda a responsabilidade de conferência dos valores e do envio dessas informações à Receita Federal é do usuário, e
 possivelmente o valor estará incoerente para alguns dos ativos, pois o código está em desenvolvimento.
+
+- Funcionando para o imposto de renda de 2023.
