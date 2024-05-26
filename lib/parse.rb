@@ -13,7 +13,8 @@ module B3ExcelParse
     QTD = 'Quantidade'
     UNIT_PRICE = 'Preço unitário'
     TOTAL_PRICE = 'Valor da Operação'
-    WARN_KEYWORDS = ['Fração em Ativos', 'Empréstimo', 'Desdobro', 'Bonificação em Ativos'].freeze
+    # Bonificação em Ativo we cannot calculate because the company give the value and does not shows in .xlsx
+    WARN_KEYWORDS = ['Fração em Ativos', 'Empréstimo', 'Bonificação em Ativos'].freeze
 
 
     def initialize(files_path)
@@ -73,6 +74,9 @@ module B3ExcelParse
           price = t[TOTAL_PRICE]
           amount += t[QTD].to_i
         end
+        if t[TYPE] == 'Desdobro'
+          amount +=  t[QTD].to_i
+        end
         price = 0 if price.is_a?(String)
         total_price += price
       end
@@ -82,6 +86,7 @@ module B3ExcelParse
     def amount_to_sum(row)
       return row[QTD].to_i if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Credito'
       return -row[QTD].to_i if row[TYPE] == 'Transferência - Liquidação' && row[SIDE] == 'Debito'
+      return row[QTD].to_i if row[TYPE] == 'Desdobro'
 
       0
     end
