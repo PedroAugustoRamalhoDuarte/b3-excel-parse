@@ -14,16 +14,17 @@ module B3ExcelParse
         desc 'Print version'
 
         def call(*)
-          puts '0.1'
+          puts '0.2'
         end
       end
 
       class ListProducts < Dry::CLI::Command
         desc 'List product info'
 
-        argument :excel_file_path, required: true, desc: 'Excel file path from b3'
+        argument :excel_file_path, type: :array, required: true, desc: 'Excel file path from b3'
 
         def call(excel_file_path:, **)
+          puts excel_file_path
           parse = Parse.new(excel_file_path)
           puts parse.all_products
         end
@@ -33,10 +34,10 @@ module B3ExcelParse
         include B3ExcelParse::Utils
         desc 'Product Info for IRPF'
 
-        argument :excel_file_path, required: true, desc: 'Excel file path from b3'
         argument :product_name, required: true, desc: 'Excel file path from b3'
-
-        def call(excel_file_path:, product_name:, **)
+        argument :excel_file_path, type: :array, required: true, desc: 'Excel file path from b3'
+        
+        def call(product_name:, excel_file_path:, **)
           parse = Parse.new(excel_file_path)
           transactions = parse.product_transactions(product_name)
           amount, avg_price, total_price = parse.product_info(product_name)
@@ -53,7 +54,7 @@ module B3ExcelParse
 
         desc 'Yield for JCP or Dividens'
 
-        argument :excel_file_path, required: true, desc: 'Excel file path from b3'
+        argument :excel_file_path, type: :array, required: true, desc: 'Excel file path from b3'
 
         def call(excel_file_path:, **)
           parse = Parse.new(excel_file_path)
@@ -77,7 +78,7 @@ module B3ExcelParse
 
         desc 'Product Info for IRPF'
 
-        argument :excel_file_path, required: true, desc: 'Excel file path from b3'
+        argument :excel_file_path, type: :array, required: true, desc: 'Excel file path from b3'
 
         def call(excel_file_path:, **)
           parse = Parse.new(excel_file_path)

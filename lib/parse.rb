@@ -16,10 +16,13 @@ module B3ExcelParse
     WARN_KEYWORDS = ['Fração em Ativos', 'Empréstimo', 'Desdobro', 'Bonificação em Ativos'].freeze
 
 
-    def initialize(file_path)
-      creek = Creek::Book.new file_path, with_headers: true
-      @sheet = creek.sheets[0]
-      @rows = @sheet.simple_rows.drop(1) # Drop header line
+    def initialize(files_path)
+      @rows = []
+      files_path.each do |file_path|
+        creek = Creek::Book.new file_path, with_headers: true
+        @sheet = creek.sheets[0]
+        @rows += @sheet.simple_rows.drop(1) # Drop header line
+      end
     end
 
     def all_products
