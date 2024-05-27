@@ -5,7 +5,7 @@ module B3ExcelParse
     def format_price(price, hide: true)
       return '-' if hide && price.zero?
 
-      "R$ #{format('%.2f', price)}"
+      "R$ #{format('%.2f', price).gsub('.', ',')}"
     end
   end
 end
